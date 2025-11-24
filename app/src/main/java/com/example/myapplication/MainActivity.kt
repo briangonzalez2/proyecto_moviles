@@ -16,13 +16,15 @@ import com.example.myapplication.view.LoginScreen
 import com.example.myapplication.view.RecetasScreen
 import com.example.myapplication.view.ConfigScreen
 import com.example.myapplication.view.MainMenuScreen
+import com.example.myapplication.view.RegisterScreen
+import com.example.myapplication.view.ProfileScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MainMenuScreen()
+            ProfileScreen()
         }
     }
 }
