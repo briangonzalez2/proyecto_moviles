@@ -15,12 +15,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
 
 @Composable
-fun MainMenuScreen() {
+fun MainMenuScreen(
+    onNavigate: (String) -> Unit = {}
+) {
 
     val background = Color(0xFFF7C879)
     val brown = Color(0xFF5D3A00)
@@ -35,7 +38,6 @@ fun MainMenuScreen() {
             .background(background)
             .padding(16.dp)
     ) {
-
         Spacer(Modifier.height(16.dp))
 
         SearchBar()
@@ -46,10 +48,7 @@ fun MainMenuScreen() {
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-
-            item {
-                SectionTitle("Recetas destacadas")
-            }
+            item { SectionTitle("Recetas destacadas") }
 
             items(featuredRecipes) {
                 RecipeCard(
@@ -59,9 +58,7 @@ fun MainMenuScreen() {
                 )
             }
 
-            item {
-                SectionTitle("Recetas favoritas")
-            }
+            item { SectionTitle("Recetas favoritas") }
 
             items(favoriteRecipes) {
                 RecipeCard(
@@ -71,10 +68,7 @@ fun MainMenuScreen() {
                 )
             }
 
-            // 🕒 Historial
-            item {
-                SectionTitle("Historial de recetas")
-            }
+            item { SectionTitle("Historial de recetas") }
 
             items(historyRecipes) {
                 RecipeCard(
@@ -86,6 +80,7 @@ fun MainMenuScreen() {
         }
     }
 }
+
 
 
 @Composable
@@ -150,3 +145,10 @@ fun RecipeCard(title: String, subtitle: String, icon: Int) {
         }
     }
 }
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun PreviewMainMenuScreen() {
+    MainMenuScreen()
+}
+

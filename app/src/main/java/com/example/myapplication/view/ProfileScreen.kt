@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -27,7 +28,8 @@ fun ProfileScreen(
     comments: List<Pair<String, String>> = listOf(
         "Cristian Martínez" to "Excelente platillo, muy delicioso y bien explicado"
     ),
-    onMenuClick: () -> Unit = {},
+    onBack: () -> Unit = {},
+    onNavigate: (String) -> Unit = {},
     onRecipeClick: (String) -> Unit = {}
 ) {
     val scroll = rememberScrollState()
@@ -47,11 +49,11 @@ fun ProfileScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = "Menu",
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = "Volver",
                 modifier = Modifier
                     .size(40.dp)
-                    .clickable { onMenuClick() }
+                    .clickable { onBack() }
             )
 
             Icon(
@@ -120,7 +122,10 @@ fun ProfileScreen(
                         Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp)
-                            .clickable { onRecipeClick(recipe) },
+                            .clickable {
+                                onRecipeClick(recipe)
+                                onNavigate("recetas")
+                            },
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -191,3 +196,4 @@ fun ProfileScreen(
         }
     }
 }
+

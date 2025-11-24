@@ -14,16 +14,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ConfigScreen() {
+fun ConfigScreen(
+    onBack: () -> Unit = {}   // ← agregado para evitar error en el NavHost
+) {
 
     // Estados temporales (solo UI)
     var username by remember { mutableStateOf("Usuario") }
     var darkMode by remember { mutableStateOf(false) }
     var notifAll by remember { mutableStateOf(false) }
     var notifMentions by remember { mutableStateOf(false) }
+
+
 
     LazyColumn(
         modifier = Modifier
@@ -217,4 +222,10 @@ fun ConfigScreen() {
             Spacer(modifier = Modifier.height(80.dp))
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewConfigScreen() {
+    ConfigScreen(onBack = {})
 }

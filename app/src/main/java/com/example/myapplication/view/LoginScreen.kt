@@ -6,10 +6,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun LoginScreen(onLogin: (String, String) -> Unit = { _, _ -> }) {
+fun LoginScreen(
+    onLoginSuccess: () -> Unit,
+    onNavigateToRegister: () -> Unit
+) {
 
     var email by remember { mutableStateOf("") }
     var pass by remember { mutableStateOf("") }
@@ -41,10 +45,29 @@ fun LoginScreen(onLogin: (String, String) -> Unit = { _, _ -> }) {
         Spacer(Modifier.height(20.dp))
 
         Button(
-            onClick = { onLogin(email, pass) },
+            onClick = {
+                // Aquí ógica real de login
+                // si login OK →
+                onLoginSuccess()
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Ingresar")
         }
+
+        Spacer(Modifier.height(16.dp))
+
+        TextButton(onClick = onNavigateToRegister) {
+            Text("¿No tienes cuenta? Regístrate")
+        }
     }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun PreviewLoginScreen() {
+    LoginScreen(
+        onLoginSuccess = {},
+        onNavigateToRegister = {}
+    )
 }

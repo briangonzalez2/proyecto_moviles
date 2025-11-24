@@ -18,7 +18,9 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun RecetasScreen() {
+fun RecetasScreen(
+    onRecipeClick: () -> Unit = {}   // ← agregado para navegación
+) {
 
     LazyColumn(
         modifier = Modifier
