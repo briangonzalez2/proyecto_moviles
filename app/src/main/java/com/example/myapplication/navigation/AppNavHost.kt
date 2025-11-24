@@ -53,7 +53,7 @@ fun AppNavHost(navController: NavHostController) {
                     navController.navigate(route)
                 }
             ) {
-                RecetasScreen(
+                MisRecetasScreen(
                     onRecipeClick = {
                         // Si tienes una receta detallada:
                         // navController.navigate("receta_detalle")
