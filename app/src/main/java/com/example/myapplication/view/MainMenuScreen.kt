@@ -46,7 +46,7 @@ fun MainMenuScreen(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             item { SectionTitle("Recetas destacadas") }
 

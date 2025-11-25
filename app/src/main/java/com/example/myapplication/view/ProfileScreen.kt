@@ -197,3 +197,11 @@ fun ProfileScreen(
     }
 }
 
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun profilePreview(){
+    ProfileScreen(
+
+    )
+}
+

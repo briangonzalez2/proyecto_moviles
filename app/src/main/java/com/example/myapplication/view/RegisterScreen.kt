@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -29,6 +30,21 @@ fun RegisterScreen(
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
 
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFFFB948)) // Color amarillo similar
+    )
+
+    Image(
+        painter = painterResource(R.drawable.img),
+        contentDescription = null,
+        modifier = Modifier.fillMaxSize(),
+        contentScale = ContentScale.Crop,
+        alpha = 0.15f
+    )
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -42,6 +58,7 @@ fun RegisterScreen(
         Text(
             text = "Fast Cook!",
             fontSize = 60.sp,
+            fontFamily = FontFamily.Cursive,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF5E3B00)
         )
@@ -55,7 +72,9 @@ fun RegisterScreen(
         OutlinedTextField(
             value = username,
             onValueChange = { username = it },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White, shape = RoundedCornerShape(10.dp)),
             placeholder = { Text("Usuario", fontSize = 20.sp) },
         )
 
@@ -68,7 +87,9 @@ fun RegisterScreen(
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White, shape = RoundedCornerShape(10.dp)),
             placeholder = { Text("Contraseña", fontSize = 20.sp) },
             visualTransformation = PasswordVisualTransformation()
         )
@@ -82,7 +103,9 @@ fun RegisterScreen(
         OutlinedTextField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White, shape = RoundedCornerShape(10.dp)),
             placeholder = { Text("Confirme contraseña", fontSize = 20.sp) },
             visualTransformation = PasswordVisualTransformation()
         )

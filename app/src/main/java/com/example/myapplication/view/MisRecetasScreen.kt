@@ -12,9 +12,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.myapplication.ui.theme.Orange80
 
 
 @Composable
@@ -23,7 +26,7 @@ fun MisRecetasScreen(
     onCreateNewRecipe: () -> Unit = {}
 ) {
 
-    val background = Color(0xFFF7BD63)
+    val background = Color(Orange80.toArgb())
 
     Box(
         modifier = Modifier
@@ -120,4 +123,12 @@ fun RecetaCardItem(
             )
         }
     }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun recetasPreview(){
+    MisRecetasScreen(
+
+    )
 }
