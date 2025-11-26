@@ -9,7 +9,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-// DataStore instance
+
 val Context.dataStore by preferencesDataStore("user_session")
 
 class UserSession(private val context: Context) {
@@ -21,7 +21,7 @@ class UserSession(private val context: Context) {
         private val KEY_LOGGED = booleanPreferencesKey("logged_in")
     }
 
-    // ===== GETTERS =====
+
     val idUsuario: Flow<Int> = context.dataStore.data.map { prefs ->
         prefs[KEY_ID] ?: 0
     }
@@ -38,7 +38,7 @@ class UserSession(private val context: Context) {
         prefs[KEY_LOGGED] ?: false
     }
 
-    // ===== SAVE USER =====
+
     suspend fun saveUser(id: Int, nombre: String, correo: String) {
         context.dataStore.edit { prefs ->
             prefs[KEY_ID] = id
@@ -48,7 +48,7 @@ class UserSession(private val context: Context) {
         }
     }
 
-    // ===== CLEAR SESSION =====
+
     suspend fun clearSession() {
         context.dataStore.edit { prefs ->
             prefs.clear()

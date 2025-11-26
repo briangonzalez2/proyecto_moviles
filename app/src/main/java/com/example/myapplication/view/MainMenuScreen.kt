@@ -22,6 +22,7 @@ import com.example.myapplication.R
 import com.example.myapplication.session.UserSession
 import kotlinx.coroutines.launch
 
+
 @Composable
 fun MainMenuScreen(
     onNavigate: (String) -> Unit = {},
@@ -34,7 +35,7 @@ fun MainMenuScreen(
     val session = remember { UserSession(context) }
     val scope = rememberCoroutineScope()
 
-    // Leer datos del usuario
+
     val nombre by session.nombreUsuario.collectAsState(initial = "")
     val correo by session.correoUsuario.collectAsState(initial = "")
 
@@ -50,10 +51,6 @@ fun MainMenuScreen(
     ) {
 
         Spacer(Modifier.height(10.dp))
-
-        // ───────────────────────────────
-        //      BARRA DE USUARIO + LOGOUT
-        // ───────────────────────────────
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -79,7 +76,9 @@ fun MainMenuScreen(
                     scope.launch {
                         session.clearSession()
                         onLogout()
+
                     }
+
                 }
             ) {
                 Icon(
@@ -91,6 +90,8 @@ fun MainMenuScreen(
             }
         }
 
+
+
         Spacer(Modifier.height(20.dp))
 
         SearchBar()
@@ -101,6 +102,7 @@ fun MainMenuScreen(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
+
             item { SectionTitle("Recetas destacadas") }
 
             items(featuredRecipes) {
@@ -153,6 +155,7 @@ fun SearchBar() {
         shape = RoundedCornerShape(15.dp)
     )
 }
+
 
 @Composable
 fun SectionTitle(text: String) {
