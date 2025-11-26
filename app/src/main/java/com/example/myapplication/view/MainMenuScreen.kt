@@ -5,11 +5,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Logout
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,15 +17,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import com.example.myapplication.R
+import com.example.myapplication.session.UserSession
+import kotlinx.coroutines.launch
 
 @Composable
 fun MainMenuScreen(
-    onNavigate: (String) -> Unit = {}
+    onNavigate: (String) -> Unit = {},
+    onLogout: () -> Unit = {}   // ← para volver al login
 ) {
 
     val background = Color(0xFFF7C879)
-    val brown = Color(0xFF5D3A00)
+
+    val context = LocalContext.current
+    val session = remember { UserSession(context) }
+    val scope = rememberCoroutineScope()
+
+    // Leer datos del usuario
+    val nombre by session.nombreUsuario.collectAsState(initial = "")
+    val correo by session.correoUsuario.collectAsState(initial = "")
 
     val featuredRecipes = listOf("Receta", "Receta", "Receta")
     val favoriteRecipes = listOf("Receta", "Receta", "Receta", "Receta")
@@ -38,7 +48,50 @@ fun MainMenuScreen(
             .background(background)
             .padding(16.dp)
     ) {
-        Spacer(Modifier.height(16.dp))
+
+        Spacer(Modifier.height(10.dp))
+
+        // ───────────────────────────────
+        //      BARRA DE USUARIO + LOGOUT
+        // ───────────────────────────────
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Column {
+                Text(
+                    text = "¡Bienvenido!",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF5D3A00)
+                )
+                Text(
+                    text = nombre.ifEmpty { "Usuario" },
+                    fontSize = 18.sp,
+                    color = Color(0xFF5D3A00)
+                )
+            }
+
+            IconButton(
+                onClick = {
+                    scope.launch {
+                        session.clearSession()
+                        onLogout()
+                    }
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Logout,
+                    contentDescription = "Cerrar sesión",
+                    tint = Color(0xFF5D3A00),
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+        }
+
+        Spacer(Modifier.height(20.dp))
 
         SearchBar()
 
@@ -80,8 +133,6 @@ fun MainMenuScreen(
         }
     }
 }
-
-
 
 @Composable
 fun SearchBar() {
@@ -151,4 +202,3 @@ fun RecipeCard(title: String, subtitle: String, icon: Int) {
 fun PreviewMainMenuScreen() {
     MainMenuScreen()
 }
-

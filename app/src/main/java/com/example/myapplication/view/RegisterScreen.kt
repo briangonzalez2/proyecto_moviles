@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.viewmodel.RegisterViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun RegisterScreen(
@@ -46,7 +47,6 @@ fun RegisterScreen(
 
         Spacer(modifier = Modifier.height(60.dp))
 
-        // Usuario
         Text("Usuario", fontSize = 28.sp, color = Color(0xFF5E3B00))
         Spacer(Modifier.height(6.dp))
 
@@ -59,7 +59,6 @@ fun RegisterScreen(
 
         Spacer(Modifier.height(30.dp))
 
-        // Contraseña
         Text("Contraseña", fontSize = 28.sp, color = Color(0xFF5E3B00))
         Spacer(Modifier.height(6.dp))
 
@@ -73,7 +72,6 @@ fun RegisterScreen(
 
         Spacer(Modifier.height(30.dp))
 
-        // Confirmar contraseña
         Text("Confirme contraseña", fontSize = 28.sp, color = Color(0xFF5E3B00))
         Spacer(Modifier.height(6.dp))
 
@@ -86,7 +84,6 @@ fun RegisterScreen(
         )
 
         Spacer(Modifier.height(60.dp))
-
 
         Button(
             onClick = {
@@ -109,12 +106,30 @@ fun RegisterScreen(
         Spacer(Modifier.height(16.dp))
 
         state?.let { result ->
+
             if (result.success) {
-                onRegisterSuccess()
+
+                // Muestra mensaje verde
+                Text(
+                    text = result.message ?: "Usuario registrado correctamente",
+                    color = Color(0xFF00A000),
+                    fontSize = 18.sp
+                )
+
+                LaunchedEffect(Unit) {
+                    delay(1200)
+                    onRegisterSuccess()
+                }
+
             } else {
-                Text(result.message ?: "Error al registrar", color = Color.Red)
+                Text(
+                    text = result.message ?: "Error al registrar",
+                    color = Color.Red,
+                    fontSize = 18.sp
+                )
             }
         }
+
         TextButton(onClick = onBackToLogin) {
             Text("¿Ya tienes cuenta? Inicia sesión")
         }
