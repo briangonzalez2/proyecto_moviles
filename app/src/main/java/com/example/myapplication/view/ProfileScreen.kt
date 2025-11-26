@@ -1,5 +1,6 @@
 package com.example.myapplication.view
 
+import android.provider.ContactsContract
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -195,5 +196,10 @@ fun ProfileScreen(
             }
         }
     }
+}
+@Preview (showBackground = true)
+@Composable
+fun ProfileScreenPreview() {
+    ProfileScreen()
 }
 
