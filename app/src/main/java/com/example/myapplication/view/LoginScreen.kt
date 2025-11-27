@@ -16,12 +16,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.ui.theme.Orange80
 import com.example.myapplication.R
 
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.platform.LocalContext
+import com.example.myapplication.viewmodel.LoginViewModel
+import com.example.myapplication.session.UserSession
 
 @Composable
 fun LoginScreen(
@@ -29,7 +32,13 @@ fun LoginScreen(
     onNavigateToRegister: () -> Unit
 ) {
 
-    var usuario by remember { mutableStateOf("") }
+    val vm: LoginViewModel = viewModel()
+    val state by vm.state.collectAsState()
+
+    val context = LocalContext.current
+    val session = remember { UserSession(context) }
+
+    var email by remember { mutableStateOf("") }
     var pass by remember { mutableStateOf("") }
 
 
@@ -44,6 +53,12 @@ fun LoginScreen(
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
             alpha = 0.15f
+
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Correo") },
+            modifier = Modifier.fillMaxWidth()
         )
 
         Column(
@@ -63,6 +78,14 @@ fun LoginScreen(
                 modifier = Modifier.padding(bottom = 40.dp)
             )
 
+        Button(
+            onClick = {
+                vm.login(email, pass, session)
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Ingresar")
+        }
 
             Text("Usuario", color = Color.DarkGray, fontSize = 16.sp)
             Spacer(Modifier.height(6.dp))
@@ -134,15 +157,26 @@ fun LoginScreen(
             ) {
                 Text("Register", fontSize = 16.sp)
             }
+        // ⚠ MENSAJES (éxito/error)
+        state.message?.let { msg ->
+            Text(
+                text = msg,
+                color = if (state.success) Color(0xFF008F39) else Color.Red,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+
+        // ⚠ SI LOGIN ES EXITOSO → NAVIGAR AUTOMÁTICAMENTE
+        if (state.success) {
+            LaunchedEffect(true) {
+                onLoginSuccess()
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        TextButton(onClick = onNavigateToRegister) {
+            Text("¿No tienes cuenta? Regístrate")
         }
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PreviewLoginScreen() {
-    LoginScreen(
-        onLoginSuccess = {},
-        onNavigateToRegister = {}
-    )
 }

@@ -1,10 +1,7 @@
 package com.example.myapplication.view
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,18 +11,22 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myapplication.R
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.viewmodel.RegisterViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun RegisterScreen(
     onRegisterSuccess: () -> Unit,
     onBackToLogin: () -> Unit
 ) {
+
+    val vm: RegisterViewModel = viewModel()
+    val state by vm.state.collectAsState()
+
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
@@ -65,7 +66,6 @@ fun RegisterScreen(
 
         Spacer(modifier = Modifier.height(60.dp))
 
-        // Usuario
         Text("Usuario", fontSize = 28.sp, color = Color(0xFF5E3B00))
         Spacer(Modifier.height(6.dp))
 
@@ -80,7 +80,6 @@ fun RegisterScreen(
 
         Spacer(Modifier.height(30.dp))
 
-        // Contraseña
         Text("Contraseña", fontSize = 28.sp, color = Color(0xFF5E3B00))
         Spacer(Modifier.height(6.dp))
 
@@ -96,7 +95,6 @@ fun RegisterScreen(
 
         Spacer(Modifier.height(30.dp))
 
-        // Confirmar contraseña
         Text("Confirme contraseña", fontSize = 28.sp, color = Color(0xFF5E3B00))
         Spacer(Modifier.height(6.dp))
 
@@ -115,7 +113,7 @@ fun RegisterScreen(
         Button(
             onClick = {
                 if (password == confirmPassword && username.isNotEmpty()) {
-                    onRegisterSuccess()
+                    vm.register(username, password)
                 }
             },
             modifier = Modifier
@@ -125,25 +123,40 @@ fun RegisterScreen(
                 containerColor = Color(0xFF6B4000),
                 contentColor = Color.White
             ),
-            shape = RoundedCornerShape(16.dp)  // <- SOLUCION
+            shape = RoundedCornerShape(16.dp)
         ) {
             Text("Registrarse", fontSize = 20.sp)
         }
 
         Spacer(Modifier.height(16.dp))
 
+        state?.let { result ->
+
+            if (result.success) {
+
+                // Muestra mensaje verde
+                Text(
+                    text = result.message ?: "Usuario registrado correctamente",
+                    color = Color(0xFF00A000),
+                    fontSize = 18.sp
+                )
+
+                LaunchedEffect(Unit) {
+                    delay(1200)
+                    onRegisterSuccess()
+                }
+
+            } else {
+                Text(
+                    text = result.message ?: "Error al registrar",
+                    color = Color.Red,
+                    fontSize = 18.sp
+                )
+            }
+        }
+
         TextButton(onClick = onBackToLogin) {
             Text("¿Ya tienes cuenta? Inicia sesión")
         }
     }
-}
-
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PreviewRegisterScreen() {
-    RegisterScreen(
-        onRegisterSuccess = {},
-        onBackToLogin = {}
-    )
 }
