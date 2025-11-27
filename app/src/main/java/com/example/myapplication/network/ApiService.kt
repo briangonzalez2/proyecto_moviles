@@ -1,5 +1,6 @@
 package com.example.myapplication.network
 
+import com.example.myapplication.model.ChefIdResponse
 import com.example.myapplication.model.FavoritoRequest
 import com.example.myapplication.model.GenericResponse
 import com.example.myapplication.model.LoginResponse
@@ -36,7 +37,21 @@ interface ApiService {
         @Part image: MultipartBody.Part,
         @Part("id_usuario") idUsuario: RequestBody
     ): Response<UploadResponse>
+    @Multipart
+    @POST("api/receta/crear.php")
+    suspend fun crearReceta(
+        @Part("id_chef") idChef: RequestBody,
+        @Part("titulo") titulo: RequestBody,
+        @Part("descripcion") descripcion: RequestBody,
+        @Part("tiempo_preparacion") tiempo: RequestBody,
+        @Part("dificultad") dificultad: RequestBody,
+        @Part("imagen") imagen: MultipartBody.Part?
 
+    ): Response<GenericResponse>
+    @GET("api/chef/get_by_user.php")
+    suspend fun getChefId(
+        @Query("id_usuario") idUsuario: Int
+    ): ChefIdResponse
     @GET("api/receta/listar.php")
     suspend fun listarRecetas(): RecetasResponse
 

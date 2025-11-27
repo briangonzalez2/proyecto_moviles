@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.ui.theme.Orange80
 
-
 @Composable
 fun MisRecetasScreen(
     onRecipeClick: (String) -> Unit = {},
@@ -124,8 +123,8 @@ fun RecetaCardItem(
         }
     }
 }
-@Preview (showBackground = true)
+@Preview(showBackground = true)
 @Composable
-fun MisRecetasScreenPreview(){
+fun MisRecetasScreenPreview() {
     MisRecetasScreen()
 }
