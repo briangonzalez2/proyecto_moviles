@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 
@@ -22,11 +23,18 @@ fun RecetasScreen(
     onRecipeClick: () -> Unit = {}   // ← agregado para navegación
 ) {
 
-    LazyColumn(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
-    ) {
+            .background(Color(0xFFFFB948)) // Color amarillo similar
+    ) {}
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        )
+
+    {
 
         item {
             Text(
@@ -206,4 +214,12 @@ fun Tag(text: String) {
 @Composable
 fun IngredientItem(name: String) {
     Text("• $name", style = MaterialTheme.typography.bodyLarge)
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun recetas2Preview(){
+    RecetasScreen(
+
+    )
 }
