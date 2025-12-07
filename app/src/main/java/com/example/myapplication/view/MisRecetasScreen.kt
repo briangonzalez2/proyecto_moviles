@@ -37,7 +37,7 @@ fun MisRecetasScreen(
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
 
-            Text(
+            Text (
                 "Mis Recetas",
                 fontSize = 32.sp,
                 color = Color(0xFF5A3A00),

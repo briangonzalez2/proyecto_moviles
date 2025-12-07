@@ -65,9 +65,6 @@ class RecetasViewModel(
     }
 
 
-    // ----------------------------------------------------------
-    // CREAR UNA NUEVA RECETA
-    // ----------------------------------------------------------
     fun crearReceta(
         titulo: String,
         descripcion: String,

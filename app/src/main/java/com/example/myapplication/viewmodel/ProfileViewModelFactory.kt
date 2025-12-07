@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.session.UserSession
 
-class ProfileViewModelFactory(
+class ProfileViewModelFactory (
     private val context: Context,
     private val session: UserSession
 ) : ViewModelProvider.Factory {

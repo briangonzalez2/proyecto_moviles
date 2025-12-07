@@ -17,7 +17,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
-//{"id":"51021","variant":"standard","title":"ProfileViewModel.kt FULL FIX"}
+
 class ProfileViewModel(
     private val context: Context,
     private val session: UserSession

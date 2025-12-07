@@ -86,7 +86,7 @@ fun CrearRecetaScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Button(
+        Button (
             onClick = {
                 onCrear(titulo, descripcion, tiempo, dificultad, imagenUri)
             },

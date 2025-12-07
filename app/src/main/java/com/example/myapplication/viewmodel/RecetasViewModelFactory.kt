@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.session.UserSession
 import com.example.myapplication.viewmodel.RecetasViewModel
 
-class RecetasViewModelFactory(
+class RecetasViewModelFactory (
     private val context: Context,
     private val session: UserSession
 ) : ViewModelProvider.Factory {
