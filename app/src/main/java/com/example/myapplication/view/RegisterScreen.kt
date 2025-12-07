@@ -128,7 +128,7 @@ fun RegisterScreen(
             Text("Registrarse", fontSize = 20.sp)
         }
 
-        Spacer(Modifier.height (16.dp))
+        Spacer(Modifier.height(16.dp))
 
         state?.let { result ->
 
