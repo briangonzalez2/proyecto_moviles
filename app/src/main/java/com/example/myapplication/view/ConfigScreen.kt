@@ -19,16 +19,13 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun ConfigScreen(
-    onBack: () -> Unit = {}   // ← agregado para evitar error en el NavHost
+    onBack: () -> Unit = {}
 ) {
 
-    // Estados temporales (solo UI)
     var username by remember { mutableStateOf("Usuario") }
     var darkMode by remember { mutableStateOf(false) }
     var notifAll by remember { mutableStateOf(false) }
     var notifMentions by remember { mutableStateOf(false) }
-
-
 
     LazyColumn(
         modifier = Modifier
@@ -38,22 +35,22 @@ fun ConfigScreen(
 
         item {
             Text(
-                text = "Administracion de cuenta",
+                text = "Administración de cuenta",
                 style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                 modifier = Modifier.padding(vertical = 12.dp)
             )
         }
 
-        // --- CAMPO DE NOMBRE ---
+        // --- Nombre ---
         item {
             Text("Nombre", style = MaterialTheme.typography.titleMedium)
+
             Spacer(modifier = Modifier.height(6.dp))
 
             OutlinedTextField(
                 value = username,
                 onValueChange = { username = it },
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
             )
 
@@ -78,10 +75,8 @@ fun ConfigScreen(
 
         // --- Tema oscuro ---
         item {
-            Text(
-                "Tema Oscuro",
-                style = MaterialTheme.typography.titleMedium
-            )
+            Text("Tema Oscuro", style = MaterialTheme.typography.titleMedium)
+
             Spacer(modifier = Modifier.height(8.dp))
 
             Row(
@@ -101,11 +96,7 @@ fun ConfigScreen(
 
                 Switch(
                     checked = darkMode,
-                    onCheckedChange = { darkMode = it },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color(0xFF6E4800),
-                        checkedTrackColor = Color(0xFFF5D18C)
-                    )
+                    onCheckedChange = { darkMode = it }
                 )
             }
 
@@ -114,10 +105,7 @@ fun ConfigScreen(
 
         // --- Idioma ---
         item {
-            Text(
-                "Idioma",
-                style = MaterialTheme.typography.titleMedium
-            )
+            Text("Idioma", style = MaterialTheme.typography.titleMedium)
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -143,7 +131,6 @@ fun ConfigScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Recibir todas
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -153,17 +140,12 @@ fun ConfigScreen(
 
                 Switch(
                     checked = notifAll,
-                    onCheckedChange = { notifAll = it },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color(0xFF6E4800),
-                        checkedTrackColor = Color(0xFFF5D18C)
-                    )
+                    onCheckedChange = { notifAll = it }
                 )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Recibir menciones
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -173,21 +155,17 @@ fun ConfigScreen(
 
                 Switch(
                     checked = notifMentions,
-                    onCheckedChange = { notifMentions = it },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color(0xFF6E4800),
-                        checkedTrackColor = Color(0xFFF5D18C)
-                    )
+                    onCheckedChange = { notifMentions = it }
                 )
             }
 
             Spacer(modifier = Modifier.height(28.dp))
         }
 
-        // --- Botón guardar ---
+        // --- Guardar ---
         item {
             Button(
-                onClick = { /* guardar cambios */ },
+                onClick = { /* guardar */ },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),
@@ -206,7 +184,7 @@ fun ConfigScreen(
         // --- Cerrar sesión ---
         item {
             Button(
-                onClick = { /* cerrar sesión */ },
+                onClick = { /* logout */ },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),
@@ -227,5 +205,7 @@ fun ConfigScreen(
 @Preview(showBackground = true)
 @Composable
 fun PreviewConfigScreen() {
-    ConfigScreen(onBack = {})
+    MaterialTheme {
+        ConfigScreen()
+    }
 }
