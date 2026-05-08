@@ -1,5 +1,6 @@
 package com.example.myapplication.view
 
+import android.app.Application
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -11,16 +12,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.R
 import com.example.myapplication.viewmodel.LoginViewModel
-import com.example.myapplication.session.UserSession
 
 @Composable
 fun LoginScreen(
@@ -28,14 +29,23 @@ fun LoginScreen(
     onNavigateToRegister: () -> Unit
 ) {
 
-    val vm: LoginViewModel = viewModel()
-    val state by vm.state.collectAsState()
-
     val context = LocalContext.current
-    val session = remember { UserSession(context) }
+
+    val vm: LoginViewModel = viewModel(
+        factory = ViewModelProvider.AndroidViewModelFactory.getInstance(
+            context.applicationContext as Application
+        )
+    )
+
+    val state by vm.state.collectAsState()
 
     var email by remember { mutableStateOf("") }
     var pass by remember { mutableStateOf("") }
+
+    // SOLO PARA PRUEBAS (crear usuario demo una vez)
+    LaunchedEffect(Unit) {
+        vm.crearUsuarioDemo()
+    }
 
     Box(
         modifier = Modifier
@@ -43,7 +53,6 @@ fun LoginScreen(
             .background(Color(0xFFFFB948))
     ) {
 
-        // Background image
         Image(
             painter = painterResource(R.drawable.img),
             contentDescription = null,
@@ -68,9 +77,9 @@ fun LoginScreen(
                 modifier = Modifier.padding(bottom = 40.dp)
             )
 
-            // EMAIL
-            Text("Correo", color = Color.DarkGray, fontSize = 16.sp)
-            Spacer(Modifier.height(6.dp))
+            Text("Correo", color = Color.DarkGray)
+
+            Spacer(modifier = Modifier.height(6.dp))
 
             OutlinedTextField(
                 value = email,
@@ -79,11 +88,11 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // PASSWORD
-            Text("Contraseña", color = Color.DarkGray, fontSize = 16.sp)
-            Spacer(Modifier.height(6.dp))
+            Text("Contraseña", color = Color.DarkGray)
+
+            Spacer(modifier = Modifier.height(6.dp))
 
             OutlinedTextField(
                 value = pass,
@@ -93,12 +102,11 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // LOGIN BUTTON
             Button(
                 onClick = {
-                    vm.login(email, pass, session)
+                    vm.login(email, pass)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -108,12 +116,15 @@ fun LoginScreen(
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Login", color = Color.White, fontSize = 18.sp)
+                Text(
+                    text = "Login",
+                    color = Color.White,
+                    fontSize = 18.sp
+                )
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // REGISTER BUTTON
             OutlinedButton(
                 onClick = onNavigateToRegister,
                 modifier = Modifier
@@ -122,27 +133,28 @@ fun LoginScreen(
                 shape = RoundedCornerShape(12.dp),
                 border = BorderStroke(2.dp, Color(0xFF8B5A06))
             ) {
-                Text("Register", fontSize = 16.sp)
+                Text("Register")
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // MESSAGE
             state.message?.let { msg ->
                 Text(
                     text = msg,
-                    color = if (state.success) Color(0xFF008F39) else Color.Red
+                    color = if (state.success)
+                        Color(0xFF008F39)
+                    else
+                        Color.Red
                 )
             }
 
-            // AUTO NAVIGATION
             if (state.success) {
                 LaunchedEffect(Unit) {
                     onLoginSuccess()
                 }
             }
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             TextButton(onClick = onNavigateToRegister) {
                 Text("¿No tienes cuenta? Regístrate")

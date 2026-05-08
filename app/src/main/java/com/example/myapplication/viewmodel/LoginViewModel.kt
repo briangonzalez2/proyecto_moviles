@@ -1,63 +1,72 @@
 package com.example.myapplication.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myapplication.model.LoginResponse
-import com.example.myapplication.network.RetrofitClient
-import com.example.myapplication.session.UserSession
+import com.example.myapplication.data.AppDatabase
+import com.example.myapplication.data.UsuarioEntity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 data class LoginState(
-    val loading: Boolean = false,
     val success: Boolean = false,
     val message: String? = null
 )
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val db = AppDatabase.getDatabase(application)
+    private val usuarioDao = db.usuarioDao()
 
     private val _state = MutableStateFlow(LoginState())
     val state: StateFlow<LoginState> = _state
 
-    fun login(correo: String, contrasena: String, session: UserSession) {
+    fun login(email: String, pass: String) {
+
         viewModelScope.launch {
-            try {
-                _state.value = LoginState(loading = true)
 
-                val api = RetrofitClient.instance.create(com.example.myapplication.network.ApiService::class.java)
-                val response: LoginResponse = api.login(correo, contrasena)
+            if (email.isBlank() || pass.isBlank()) {
 
-                if (response.success) {
-
-                    // Guardar datos en sesión
-                    session.saveUser(
-                        id = response.id_usuario ?: 0,
-                        nombre = response.nombre_usuario ?: "",
-                        correo = correo
-                    )
-
-                    // Éxito
-                    _state.value = LoginState(
-                        loading = false,
-                        success = true,
-                        message = "Inicio de sesión exitoso"
-                    )
-                } else {
-                    _state.value = LoginState(
-                        loading = false,
-                        success = false,
-                        message = response.message ?: "Credenciales incorrectas"
-                    )
-                }
-
-            } catch (e: Exception) {
                 _state.value = LoginState(
-                    loading = false,
                     success = false,
-                    message = "Error de conexión: ${e.message}"
+                    message = "Completa todos los campos"
+                )
+
+                return@launch
+            }
+
+            val user = usuarioDao.login(email, pass)
+
+            if (user != null) {
+
+                _state.value = LoginState(
+                    success = true,
+                    message = "Bienvenido ${user.nombre_usuario}"
+                )
+
+            } else {
+
+                _state.value = LoginState(
+                    success = false,
+                    message = "Credenciales incorrectas"
                 )
             }
+        }
+    }
+
+    fun crearUsuarioDemo() {
+
+        viewModelScope.launch {
+
+            usuarioDao.insertarUsuario(
+                UsuarioEntity(
+                    nombre_usuario = "admin",
+                    email = "admin@test.com",
+                    password = "1234",
+                    role = "chef"
+                )
+            )
         }
     }
 }

@@ -8,22 +8,21 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.myapplication.component.AppScaffold
-import com.example.myapplication.model.RecetasViewModelFactory
 import com.example.myapplication.viewmodel.ProfileViewModelFactory
-import com.example.myapplication.session.UserSession
 import com.example.myapplication.view.*
 import com.example.myapplication.viewmodel.ProfileViewModel
-import com.example.myapplication.viewmodel.RecetasViewModel
+import com.example.myapplication.view.LoginScreen
+import com.example.myapplication.session.UserSession
 
 @Composable
 fun AppNavHost(navController: NavHostController) {
 
     NavHost(
         navController = navController,
-        startDestination = "home"
+        startDestination = "login"
     ) {
 
-        // LOGIN
+        // 🔐 LOGIN
         composable("login") {
             LoginScreen(
                 onLoginSuccess = {
@@ -37,7 +36,7 @@ fun AppNavHost(navController: NavHostController) {
             )
         }
 
-        // REGISTER
+        // 📝 REGISTER
         composable("register") {
             RegisterScreen(
                 onRegisterSuccess = {
@@ -51,7 +50,7 @@ fun AppNavHost(navController: NavHostController) {
             )
         }
 
-        // HOME
+        // 🏠 HOME
         composable("home") {
             AppScaffold(
                 onNavigate = { route -> navController.navigate(route) }
@@ -66,13 +65,13 @@ fun AppNavHost(navController: NavHostController) {
             }
         }
 
-        // 📌 LISTA DE RECETAS (MÍAS)
+        // 🍳 MIS RECETAS
         composable("recetas") {
             AppScaffold(
                 onNavigate = { route -> navController.navigate(route) }
             ) {
                 MisRecetasScreen(
-                    onRecipeClick = { /* abrir detalle */ },
+                    onRecipeClick = { /* TODO */ },
                     onCreateNewRecipe = {
                         navController.navigate("crear_receta")
                     }
@@ -80,8 +79,9 @@ fun AppNavHost(navController: NavHostController) {
             }
         }
 
-        // 👤 PERFIL
+        // 👤 PERFIL (puedes dejarlo así por ahora)
         composable("perfil") {
+
             val context = LocalContext.current
             val session = UserSession(context)
 
@@ -116,22 +116,13 @@ fun AppNavHost(navController: NavHostController) {
                 )
             }
         }
+
+        // ➕ CREAR RECETA
         composable("crear_receta") {
-            val context = LocalContext.current
-            val session = UserSession(context)
-
-            // Crear el ViewModel con la factory correcta
-            val recetasViewModel: com.example.myapplication.viewmodel.RecetasViewModel = viewModel(
-                factory = com.example.myapplication.model.RecetasViewModelFactory(context, session)
-            )
-
             CrearRecetaScreen(
                 onBack = { navController.popBackStack() },
                 onCrear = { titulo, descripcion, tiempo, dificultad, imagenUri ->
-                    android.util.Log.d("AppNavHost", "onCrear llamado desde NavHost -> titulo=$titulo")
-                    // Llamar al ViewModel (asíncrono)
-                    recetasViewModel.crearReceta(titulo, descripcion, tiempo, dificultad, imagenUri)
-                    // Opcional: volver a la pantalla anterior inmediatamente
+                    // aquí luego conectamos Room
                     navController.popBackStack()
                 }
             )

@@ -1,5 +1,6 @@
 package com.example.myapplication.view
 
+import android.app.Application
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -10,17 +11,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.R
 import com.example.myapplication.viewmodel.RegisterViewModel
 import kotlinx.coroutines.delay
-import com.example.myapplication.R
-
 
 @Composable
 fun RegisterScreen(
@@ -28,139 +30,187 @@ fun RegisterScreen(
     onBackToLogin: () -> Unit
 ) {
 
-    val vm: RegisterViewModel = viewModel()
+    val context = LocalContext.current
+
+    val vm: RegisterViewModel = viewModel(
+        factory = ViewModelProvider.AndroidViewModelFactory.getInstance(
+            context.applicationContext as Application
+        )
+    )
+
     val state by vm.state.collectAsState()
 
     var username by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
+
+    // chef o user
+    var role by remember { mutableStateOf("user") }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFFFB948)) // Color amarillo similar
-    )
-
-    Image(
-        painter = painterResource(R.drawable.img),
-        contentDescription = null,
-        modifier = Modifier.fillMaxSize(),
-        contentScale = ContentScale.Crop,
-        alpha = 0.15f
-    )
-
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
+            .background(Color(0xFFFFB948))
     ) {
 
-        Spacer(modifier = Modifier.height(80.dp))
-
-        Text(
-            text = "Fast Cook!",
-            fontSize = 60.sp,
-            fontFamily = FontFamily.Cursive,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF5E3B00)
+        Image(
+            painter = painterResource(R.drawable.img),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+            alpha = 0.15f
         )
 
-        Spacer(modifier = Modifier.height(60.dp))
-
-        Text("Usuario", fontSize = 28.sp, color = Color(0xFF5E3B00))
-        Spacer(Modifier.height(6.dp))
-
-        OutlinedTextField(
-            value = username,
-            onValueChange = { username = it },
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White, shape = RoundedCornerShape(10.dp)),
-            placeholder = { Text("Usuario", fontSize = 20.sp) },
-        )
-
-        Spacer(Modifier.height(30.dp))
-
-        Text("Contraseña", fontSize = 28.sp, color = Color(0xFF5E3B00))
-        Spacer(Modifier.height(6.dp))
-
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White, shape = RoundedCornerShape(10.dp)),
-            placeholder = { Text("Contraseña", fontSize = 20.sp) },
-            visualTransformation = PasswordVisualTransformation()
-        )
-
-        Spacer(Modifier.height(30.dp))
-
-        Text("Confirme contraseña", fontSize = 28.sp, color = Color(0xFF5E3B00))
-        Spacer(Modifier.height(6.dp))
-
-        OutlinedTextField(
-            value = confirmPassword,
-            onValueChange = { confirmPassword = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White, shape = RoundedCornerShape(10.dp)),
-            placeholder = { Text("Confirme contraseña", fontSize = 20.sp) },
-            visualTransformation = PasswordVisualTransformation()
-        )
-
-        Spacer(Modifier.height(60.dp))
-
-        Button(
-            onClick = {
-                if (password == confirmPassword && username.isNotEmpty()) {
-                    vm.register(username, password)
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth(0.8f)
-                .height(55.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF6B4000),
-                contentColor = Color.White
-            ),
-            shape = RoundedCornerShape(16.dp)
+                .fillMaxSize()
+                .padding(horizontal = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
-            Text("Registrarse", fontSize = 20.sp)
-        }
 
-        Spacer(Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(80.dp))
 
-        state?.let { result ->
+            Text(
+                text = "Fast Cook!",
+                fontSize = 60.sp,
+                fontFamily = FontFamily.Cursive,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF5E3B00)
+            )
 
-            if (result.success) {
+            Spacer(modifier = Modifier.height(40.dp))
 
-                // Muestra mensaje verde
-                Text(
-                    text = result.message ?: "Usuario registrado correctamente",
-                    color = Color(0xFF00A000),
-                    fontSize = 18.sp
-                )
+            Text("Usuario", fontSize = 22.sp)
 
-                LaunchedEffect(Unit) {
-                    delay(1200)
-                    onRegisterSuccess()
+            Spacer(Modifier.height(6.dp))
+
+            OutlinedTextField(
+                value = username,
+                onValueChange = { username = it },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("Usuario") }
+            )
+
+            Spacer(Modifier.height(20.dp))
+
+            Text("Correo", fontSize = 22.sp)
+
+            Spacer(Modifier.height(6.dp))
+
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("Correo") }
+            )
+
+            Spacer(Modifier.height(20.dp))
+
+            Text("Contraseña", fontSize = 22.sp)
+
+            Spacer(Modifier.height(6.dp))
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("Contraseña") },
+                visualTransformation = PasswordVisualTransformation()
+            )
+
+            Spacer(Modifier.height(20.dp))
+
+            Text("Confirmar contraseña", fontSize = 22.sp)
+
+            Spacer(Modifier.height(6.dp))
+
+            OutlinedTextField(
+                value = confirmPassword,
+                onValueChange = { confirmPassword = it },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("Confirmar contraseña") },
+                visualTransformation = PasswordVisualTransformation()
+            )
+
+            Spacer(Modifier.height(20.dp))
+
+            // ROLE
+            Text("Tipo de usuario")
+
+            Spacer(Modifier.height(8.dp))
+
+            Row {
+
+                Button(
+                    onClick = { role = "user" }
+                ) {
+                    Text("Usuario")
                 }
 
-            } else {
+                Spacer(Modifier.width(12.dp))
+
+                Button(
+                    onClick = { role = "chef" }
+                ) {
+                    Text("Chef")
+                }
+            }
+
+            Spacer(Modifier.height(40.dp))
+
+            Button(
+                onClick = {
+
+                    if (password != confirmPassword) {
+                        return@Button
+                    }
+
+                    vm.register(
+                        username,
+                        email,
+                        password,
+                        role
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .height(55.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF6B4000),
+                    contentColor = Color.White
+                ),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Text("Registrarse", fontSize = 20.sp)
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            if (state.message != null) {
+
                 Text(
-                    text = result.message ?: "Error al registrar",
-                    color = Color.Red,
+                    text = state.message!!,
+                    color = if (state.success)
+                        Color(0xFF00A000)
+                    else
+                        Color.Red,
                     fontSize = 18.sp
                 )
-            }
-        }
 
-        TextButton(onClick = onBackToLogin) {
-            Text("¿Ya tienes cuenta? Inicia sesión")
+                if (state.success) {
+
+                    LaunchedEffect(Unit) {
+                        delay(1200)
+                        onRegisterSuccess()
+                    }
+                }
+            }
+
+            TextButton(onClick = onBackToLogin) {
+                Text("¿Ya tienes cuenta? Inicia sesión")
+            }
         }
     }
 }

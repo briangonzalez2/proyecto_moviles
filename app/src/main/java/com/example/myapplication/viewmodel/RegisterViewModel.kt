@@ -1,38 +1,73 @@
 package com.example.myapplication.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.myapplication.data.AppDatabase
+import com.example.myapplication.data.UsuarioEntity
 import com.example.myapplication.model.RegisterState
-import com.example.myapplication.network.ApiService
-import com.example.myapplication.network.RetrofitClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class RegisterViewModel : ViewModel() {
+class RegisterViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val api = RetrofitClient.instance.create(ApiService::class.java)
+    private val db = AppDatabase.getDatabase(application)
+    private val usuarioDao = db.usuarioDao()
 
-    private val _state = MutableStateFlow<RegisterState?>(null)
-    val state: StateFlow<RegisterState?> = _state
+    private val _state = MutableStateFlow(RegisterState())
+    val state: StateFlow<RegisterState> = _state
 
-    fun register(nombre: String, contrasena: String) {
+    fun register(
+        nombre: String,
+        email: String,
+        password: String,
+        role: String
+    ) {
+
         viewModelScope.launch {
-            try {
-                val response = api.register(nombre, contrasena)
 
-                _state.value = RegisterState(
-                    success = response.success,    // <- usar success
-                    message = response.message
-                )
+            if (
+                nombre.isBlank() ||
+                email.isBlank() ||
+                password.isBlank()
+            ) {
 
-            } catch (e: Exception) {
                 _state.value = RegisterState(
                     success = false,
-                    message = "Error al conectar con el servidor"
+                    message = "Completa todos los campos"
                 )
+
+                return@launch
             }
+
+            // Verificar si ya existe
+            val existingUser = usuarioDao.buscarPorEmail(email)
+
+            if (existingUser != null) {
+
+                _state.value = RegisterState(
+                    success = false,
+                    message = "El correo ya está registrado"
+                )
+
+                return@launch
+            }
+
+            // Crear usuario
+            usuarioDao.insertarUsuario(
+                UsuarioEntity(
+                    nombre_usuario = nombre,
+                    email = email,
+                    password = password,
+                    role = role
+                )
+            )
+
+            _state.value = RegisterState(
+                success = true,
+                message = "Usuario registrado correctamente"
+            )
         }
     }
 }
-
