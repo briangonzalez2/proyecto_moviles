@@ -1,5 +1,6 @@
 package com.example.myapplication.view
 
+import android.app.Application
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,41 +15,87 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.myapplication.R
+import com.example.myapplication.viewmodel.ProfileViewModel
+import coil.compose.AsyncImage
+import com.example.myapplication.data.UsuarioEntity
+import com.example.myapplication.data.RecetaEntity
 
 @Composable
 fun ProfileScreen(
-    imageUrl: String? = null,   // Recibe la URL del ViewModel
-    userName: String = "Nombre",
-    recipes: List<String> = listOf("Receta", "Receta", "Receta", "Receta"),
-    comments: List<Pair<String, String>> = listOf(
-        "Cristian Martínez" to "Excelente platillo, muy delicioso y bien explicado"
-    ),
     onBack: () -> Unit = {},
     onNavigate: (String) -> Unit = {},
-    onRecipeClick: (String) -> Unit = {},
-    onImageSelected: (Uri) -> Unit = {}
+    onRecipeClick: (Int) -> Unit = {}
 ) {
 
+    val context = LocalContext.current
+
+    // Using a safe cast and a nullable factory to avoid ClassCastException in Previews.
+    // In Preview mode, applicationContext may not be an instance of Application.
+    val vm: ProfileViewModel = viewModel(
+        factory = (context.applicationContext as? Application)?.let {
+            ViewModelProvider.AndroidViewModelFactory.getInstance(it)
+        }
+    )
+
+    val user by vm.usuario.collectAsState()
+    val recetas by vm.recetas.collectAsState()
+    val imageUrl by vm.profileImageUrl.collectAsState()
+
+    ProfileContent(
+        user = user,
+        recetas = recetas,
+        imageUrl = imageUrl,
+        onBack = onBack,
+        onRecipeClick = onRecipeClick,
+        onImageSelected = { vm.guardarFotoPerfil(it) }
+    )
+}
+
+@Composable
+fun ProfileContent(
+    user: UsuarioEntity?,
+    recetas: List<RecetaEntity>,
+    imageUrl: String?,
+    onBack: () -> Unit,
+    onRecipeClick: (Int) -> Unit,
+    onImageSelected: (Uri) -> Unit
+) {
+    val context = LocalContext.current
     val scroll = rememberScrollState()
 
-    // Launcher para elegir la imagen
+    // SELECT IMAGE
     val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
+        contract = ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
-        if (uri != null) onImageSelected(uri)
+        uri?.let {
+            try {
+                // guardar permiso permanente
+                context.contentResolver.takePersistableUriPermission(
+                    it,
+                    android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (e: Exception) {
+                // Silently ignore permission errors in Preview
+            }
+            // guardar en Room/ViewModel
+            onImageSelected(it)
+        }
     }
 
     Column(
@@ -58,6 +105,8 @@ fun ProfileScreen(
             .verticalScroll(scroll)
             .padding(16.dp)
     ) {
+
+        Spacer(modifier = Modifier.height(20.dp))
 
         // HEADER
         Row(
@@ -70,7 +119,9 @@ fun ProfileScreen(
                 contentDescription = "Volver",
                 modifier = Modifier
                     .size(40.dp)
-                    .clickable { onBack() }
+                    .clickable {
+                        onBack()
+                    }
             )
 
             Icon(
@@ -84,18 +135,18 @@ fun ProfileScreen(
 
         // LOGO
         Text(
-            "Fast Cook!",
+            text = "Fast Cook!",
             fontSize = 38.sp,
             fontFamily = FontFamily.Cursive,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 
-        // "icono"
-        Image(
-            painter = rememberAsyncImagePainter(
-                model = imageUrl ?: R.drawable.ic_launcher_foreground
-            ),
-            contentDescription = "User avatar",
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // PROFILE IMAGE
+        AsyncImage(
+            model = imageUrl ?: R.drawable.ic_launcher_foreground,
+            contentDescription = "Foto perfil",
             modifier = Modifier
                 .size(200.dp)
                 .clip(CircleShape)
@@ -103,121 +154,163 @@ fun ProfileScreen(
             contentScale = ContentScale.Crop
         )
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
-        // boton para el cambio de imagen (no actualiza aun)
+        // CHANGE IMAGE BUTTON
         Button(
-            onClick = { launcher.launch("image/*") },
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            onClick = {
+                launcher.launch(arrayOf("image/*"))
+            },
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF6B4000)
+            )
         ) {
             Text("Cambiar foto")
         }
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         // USER NAME
         Text(
-            userName,
+            text = user?.nombre_usuario ?: "Usuario",
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF68400A)
         )
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         // RECETAS
         Text(
-            "Recetas:",
+            text = "Mis recetas",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF68400A)
         )
 
-        Spacer(Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(Color.White),
+            shape = RoundedCornerShape(18.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White
+            ),
             elevation = CardDefaults.cardElevation(6.dp)
         ) {
-            Column(Modifier.padding(10.dp)) {
-                recipes.forEachIndexed { index, recipe ->
+            Column(
+                modifier = Modifier.padding(12.dp)
+            ) {
+                recetas.forEachIndexed { index, receta ->
                     Row(
-                        Modifier
+                        modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 8.dp)
                             .clickable {
-                                onRecipeClick(recipe)
-                                onNavigate("recetas")
-                            },
+                                onRecipeClick(receta.id)
+                            }
+                            .padding(vertical = 10.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(imageVector = Icons.Default.StarBorder, contentDescription = null)
-                            Spacer(Modifier.width(6.dp))
-                            Text(recipe, fontSize = 18.sp)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.FavoriteBorder,
+                                contentDescription = null,
+                                tint = Color.Red
+                            )
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Text(
+                                text = receta.titulo,
+                                fontSize = 18.sp
+                            )
                         }
 
                         Icon(
-                            imageVector = Icons.Default.KeyboardArrowUp,
+                            imageVector = Icons.Default.KeyboardArrowRight,
                             contentDescription = null
                         )
                     }
 
-                    if (index < recipes.lastIndex) Divider()
+                    if (index < recetas.lastIndex) {
+                        Divider()
+                    }
                 }
             }
         }
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(30.dp))
 
-
+        // COMENTARIOS FAKE POR AHORA
         Text(
-            "Comentarios:",
+            text = "Comentarios",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF68400A)
         )
 
-        Spacer(Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-        comments.forEach { (author, text) ->
+        repeat(2) {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 12.dp),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(16.dp),
                 elevation = CardDefaults.cardElevation(6.dp)
             ) {
                 Row(
-                    modifier = Modifier.padding(12.dp),
+                    modifier = Modifier.padding(14.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         imageVector = Icons.Default.Person,
                         contentDescription = null,
-                        modifier = Modifier.size(40.dp)
+                        modifier = Modifier.size(42.dp)
                     )
 
-                    Spacer(Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(12.dp))
 
                     Column {
-                        Text(author, fontWeight = FontWeight.Bold)
-                        Text(text, fontSize = 14.sp)
+                        Text(
+                            text = "Usuario",
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Text(
+                            text = "Muy buena receta 👌",
+                            fontSize = 14.sp
+                        )
                     }
                 }
             }
         }
+
+        Spacer(modifier = Modifier.height(40.dp))
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true)
 @Composable
-fun profilePreview(){
-    ProfileScreen(
-
+fun ProfileScreenPreview() {
+    ProfileContent(
+        user = UsuarioEntity(
+            nombre_usuario = "Usuario de Prueba",
+            email = "test@example.com",
+            password = "",
+            role = "chef"
+        ),
+        recetas = listOf(
+            RecetaEntity(titulo = "Receta 1", descripcion = "", tiempo = "10 min", dificultad = "Fácil", imagenUri = null, autor = "Usuario de Prueba"),
+            RecetaEntity(titulo = "Receta 2", descripcion = "", tiempo = "20 min", dificultad = "Media", imagenUri = null, autor = "Usuario de Prueba")
+        ),
+        imageUrl = null,
+        onBack = {},
+        onRecipeClick = {},
+        onImageSelected = {}
     )
 }
-

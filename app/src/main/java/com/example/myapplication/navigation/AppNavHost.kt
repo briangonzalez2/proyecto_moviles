@@ -5,14 +5,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.myapplication.component.AppScaffold
-import com.example.myapplication.viewmodel.ProfileViewModelFactory
+import com.example.myapplication.session.UserSession
 import com.example.myapplication.view.*
 import com.example.myapplication.viewmodel.ProfileViewModel
-import com.example.myapplication.view.LoginScreen
-import com.example.myapplication.session.UserSession
 
 @Composable
 fun AppNavHost(navController: NavHostController) {
@@ -24,13 +24,20 @@ fun AppNavHost(navController: NavHostController) {
 
         // 🔐 LOGIN
         composable("login") {
+
             LoginScreen(
                 onLoginSuccess = {
+
                     navController.navigate("home") {
-                        popUpTo("login") { inclusive = true }
+
+                        popUpTo("login") {
+                            inclusive = true
+                        }
                     }
                 },
+
                 onNavigateToRegister = {
+
                     navController.navigate("register")
                 }
             )
@@ -38,13 +45,20 @@ fun AppNavHost(navController: NavHostController) {
 
         // 📝 REGISTER
         composable("register") {
+
             RegisterScreen(
                 onRegisterSuccess = {
+
                     navController.navigate("home") {
-                        popUpTo("register") { inclusive = true }
+
+                        popUpTo("register") {
+                            inclusive = true
+                        }
                     }
                 },
+
                 onBackToLogin = {
+
                     navController.navigate("login")
                 }
             )
@@ -52,13 +66,26 @@ fun AppNavHost(navController: NavHostController) {
 
         // 🏠 HOME
         composable("home") {
+
             AppScaffold(
-                onNavigate = { route -> navController.navigate(route) }
+                onNavigate = { route ->
+                    navController.navigate(route)
+                }
             ) {
+
                 MainMenuScreen(
+
+                    onNavigate = { route ->
+                        navController.navigate(route)
+                    },
+
                     onLogout = {
+
                         navController.navigate("login") {
-                            popUpTo("home") { inclusive = true }
+
+                            popUpTo("home") {
+                                inclusive = true
+                            }
                         }
                     }
                 )
@@ -67,40 +94,82 @@ fun AppNavHost(navController: NavHostController) {
 
         // 🍳 MIS RECETAS
         composable("recetas") {
+
             AppScaffold(
-                onNavigate = { route -> navController.navigate(route) }
+                onNavigate = { route ->
+                    navController.navigate(route)
+                }
             ) {
+
                 MisRecetasScreen(
-                    onRecipeClick = { /* TODO */ },
+
+                    onRecipeClick = { recetaId ->
+
+                        navController.navigate(
+                            "receta/$recetaId"
+                        )
+                    },
+
                     onCreateNewRecipe = {
-                        navController.navigate("crear_receta")
+
+                        navController.navigate(
+                            "crear_receta"
+                        )
                     }
                 )
             }
         }
 
-        // 👤 PERFIL (puedes dejarlo así por ahora)
-        composable("perfil") {
+        // 📖 DETALLE RECETA
+        composable(
+            route = "receta/{id}",
 
-            val context = LocalContext.current
-            val session = UserSession(context)
-
-            val viewModel: ProfileViewModel = viewModel(
-                factory = ProfileViewModelFactory(context, session)
+            arguments = listOf(
+                navArgument("id") {
+                    type = NavType.IntType
+                }
             )
+        ) { backStackEntry ->
 
-            val imageUrl = viewModel.profileImageUrl.collectAsState().value
+            val recetaId =
+                backStackEntry.arguments?.getInt("id") ?: 0
 
             AppScaffold(
-                onNavigate = { route -> navController.navigate(route) }
+                onNavigate = { route ->
+                    navController.navigate(route)
+                }
             ) {
+
+                RecetasScreen(
+                    recetaId = recetaId
+                )
+            }
+        }
+
+        // 👤 PERFIL
+        composable("perfil") {
+
+            AppScaffold(
+                onNavigate = { route ->
+                    navController.navigate(route)
+                }
+            ) {
+
                 ProfileScreen(
-                    imageUrl = imageUrl,
-                    onBack = { navController.popBackStack() },
-                    onNavigate = { navController.navigate(it) },
-                    onRecipeClick = {},
-                    onImageSelected = { uri ->
-                        viewModel.uploadProfileImage(uri)
+
+                    onBack = {
+                        navController.popBackStack()
+                    },
+
+                    onNavigate = {
+                        navController.navigate(it)
+                    },
+
+                    onRecipeClick = { recetaId ->
+
+                        navController.navigate(
+                            "receta/$recetaId"
+                        )
                     }
                 )
             }
@@ -108,21 +177,26 @@ fun AppNavHost(navController: NavHostController) {
 
         // ⚙ CONFIG
         composable("config") {
+
             AppScaffold(
-                onNavigate = { route -> navController.navigate(route) }
+                onNavigate = { route ->
+                    navController.navigate(route)
+                }
             ) {
+
                 ConfigScreen(
-                    onBack = { navController.popBackStack() }
+                    onBack = {
+                        navController.popBackStack()
+                    }
                 )
             }
         }
 
         // ➕ CREAR RECETA
         composable("crear_receta") {
+
             CrearRecetaScreen(
-                onBack = { navController.popBackStack() },
-                onCrear = { titulo, descripcion, tiempo, dificultad, imagenUri ->
-                    // aquí luego conectamos Room
+                onBack = {
                     navController.popBackStack()
                 }
             )

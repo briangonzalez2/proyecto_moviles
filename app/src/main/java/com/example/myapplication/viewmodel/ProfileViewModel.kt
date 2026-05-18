@@ -1,72 +1,108 @@
-
 package com.example.myapplication.viewmodel
 
-import android.content.Context
+import android.app.Application
 import android.net.Uri
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myapplication.network.ApiService
-import com.example.myapplication.network.RetrofitClient
+import com.example.myapplication.data.AppDatabase
+import com.example.myapplication.data.RecetaEntity
+import com.example.myapplication.data.UsuarioEntity
 import com.example.myapplication.session.UserSession
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.File
 
 class ProfileViewModel(
-    private val context: Context,
-    private val session: UserSession
-) : ViewModel() {
+    application: Application
+) : AndroidViewModel(application) {
 
-    // ← URL BASE del servidor
-    private val baseUrl = "http://192.168.18.143/api/uploads/profile/"
+    private val db = AppDatabase.getDatabase(application)
 
-    private val _profileImageUrl = MutableStateFlow<String?>(null)
-    val profileImageUrl: StateFlow<String?> = _profileImageUrl
+    private val usuarioDao = db.usuarioDao()
 
-    private val api = RetrofitClient.instance.create(ApiService::class.java)
+    private val recetaDao = db.recetaDao()
 
-    fun uploadProfileImage(uri: Uri) {
+    private val session =
+        UserSession(application)
+
+    // USUARIO
+    private val _usuario =
+        MutableStateFlow<UsuarioEntity?>(null)
+
+    val usuario: StateFlow<UsuarioEntity?> =
+        _usuario
+
+    // RECETAS
+    private val _recetas =
+        MutableStateFlow<List<RecetaEntity>>(emptyList())
+
+    val recetas:
+            StateFlow<List<RecetaEntity>>
+            = _recetas
+
+    // FOTO PERFIL
+    private val _profileImageUrl =
+        MutableStateFlow<String?>(null)
+
+    val profileImageUrl:
+            StateFlow<String?>
+            = _profileImageUrl
+
+    init {
+
+        cargarUsuario()
+    }
+
+    private fun cargarUsuario() {
+
         viewModelScope.launch {
-            try {
-                val idUsuario = session.idUsuario.first()
-                if (idUsuario == 0) return@launch
 
-                // Copiar imagen a archivo temporal
-                val input = context.contentResolver.openInputStream(uri)
-                val tempFile = File.createTempFile("profile", ".jpg", context.cacheDir)
-                tempFile.outputStream().use { output -> input!!.copyTo(output) }
+            session.nombreUsuario.collect { nombre ->
 
-                // Preparar multipart
-                val imageRequest = tempFile.asRequestBody("image/*".toMediaType())
-                val imagePart = MultipartBody.Part.createFormData(
-                    "image", tempFile.name, imageRequest
+                if (nombre.isNotEmpty()) {
+
+                    val user =
+                        usuarioDao.obtenerUsuario(nombre)
+
+                    _usuario.value = user
+
+                    _profileImageUrl.value =
+                        user?.fotoPerfil
+
+                    _recetas.value =
+                        recetaDao.obtenerPorAutor(nombre)
+                }
+            }
+        }
+    }
+
+    fun guardarFotoPerfil(uri: Uri) {
+
+        viewModelScope.launch {
+
+            val user = _usuario.value
+                ?: return@launch
+
+            val nuevaFoto =
+                uri.toString()
+
+            // guardar en Room
+            usuarioDao.actualizarFoto(
+                user.id_usuario,
+                nuevaFoto
+            )
+
+            // actualizar usuario en memoria
+            val updatedUser =
+                user.copy(
+                    fotoPerfil = nuevaFoto
                 )
 
-                val idPart = idUsuario.toString()
-                    .toRequestBody("text/plain".toMediaType())
+            _usuario.value =
+                updatedUser
 
-                // Enviar a API
-                val response = api.uploadProfileImage(imagePart, idPart)
-
-                if (response.isSuccessful && response.body()?.success == true) {
-
-                    val fileName = response.body()?.imageUrl
-
-                    // Construir URL completa
-                    if (!fileName.isNullOrEmpty()) {
-                        _profileImageUrl.value = baseUrl + fileName
-                    }
-                }
-
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            _profileImageUrl.value =
+                nuevaFoto
         }
     }
 }

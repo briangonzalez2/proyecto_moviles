@@ -42,7 +42,6 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var pass by remember { mutableStateOf("") }
 
-    // SOLO PARA PRUEBAS (crear usuario demo una vez)
     LaunchedEffect(Unit) {
         vm.crearUsuarioDemo()
     }

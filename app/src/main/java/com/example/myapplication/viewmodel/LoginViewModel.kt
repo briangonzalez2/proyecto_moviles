@@ -49,7 +49,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
                 _state.value = LoginState(
                     success = false,
-                    message = "Credenciales incorrectas"
+                    message = "Nombre o Contraseña incorrecto"
                 )
             }
         }

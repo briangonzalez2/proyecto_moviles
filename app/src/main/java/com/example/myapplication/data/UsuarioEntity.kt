@@ -10,5 +10,6 @@ data class UsuarioEntity(
     val nombre_usuario: String,
     val email: String,
     val password: String,
-    val role: String // chef o user
+    val role: String, // chef o user
+    val fotoPerfil: String? = null
 )

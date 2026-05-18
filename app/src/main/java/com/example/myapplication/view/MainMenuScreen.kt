@@ -1,13 +1,16 @@
 package com.example.myapplication.view
 
+import android.app.Application
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,39 +21,62 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.R
 import com.example.myapplication.session.UserSession
+import com.example.myapplication.viewmodel.MainMenuViewModel
 import kotlinx.coroutines.launch
-
 
 @Composable
 fun MainMenuScreen(
     onNavigate: (String) -> Unit = {},
-    onLogout: () -> Unit = {}   // ← para volver al login
+    onLogout: () -> Unit = {}
 ) {
 
     val background = Color(0xFFF7C879)
 
     val context = LocalContext.current
+
+    // SESSION
     val session = remember { UserSession(context) }
+
     val scope = rememberCoroutineScope()
 
-
     val nombre by session.nombreUsuario.collectAsState(initial = "")
-    val correo by session.correoUsuario.collectAsState(initial = "")
 
-    val featuredRecipes = listOf("Receta", "Receta", "Receta")
-    val favoriteRecipes = listOf("Receta", "Receta", "Receta", "Receta")
-    val historyRecipes = listOf("Receta", "Receta", "Receta", "Receta", "Receta")
+    // VIEWMODEL
+    val vm: MainMenuViewModel = viewModel(
+        factory = ViewModelProvider.AndroidViewModelFactory.getInstance(
+            context.applicationContext as Application
+        )
+    )
+
+    // RECETAS
+    val recetas by vm.recetasDestacadas.collectAsState()
+
+    val favoritas by vm.recetasFavoritas.collectAsState()
+
+    // CARGAR FAVORITAS
+    LaunchedEffect(nombre) {
+
+        if (nombre.isNotEmpty()) {
+
+            vm.cargarFavoritas(nombre)
+        }
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(background)
+            .statusBarsPadding()
             .padding(16.dp)
     ) {
 
         Spacer(Modifier.height(10.dp))
+
+        // HEADER
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -58,12 +84,14 @@ fun MainMenuScreen(
         ) {
 
             Column {
+
                 Text(
                     text = "¡Bienvenido!",
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF5D3A00)
                 )
+
                 Text(
                     text = nombre.ifEmpty { "Usuario" },
                     fontSize = 18.sp,
@@ -73,14 +101,16 @@ fun MainMenuScreen(
 
             IconButton(
                 onClick = {
+
                     scope.launch {
+
                         session.clearSession()
+
                         onLogout()
-
                     }
-
                 }
             ) {
+
                 Icon(
                     imageVector = Icons.Default.Logout,
                     contentDescription = "Cerrar sesión",
@@ -89,8 +119,6 @@ fun MainMenuScreen(
                 )
             }
         }
-
-
 
         Spacer(Modifier.height(20.dp))
 
@@ -103,33 +131,67 @@ fun MainMenuScreen(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
 
-            item { SectionTitle("Recetas destacadas") }
+            // DESTACADAS
+            item {
 
-            items(featuredRecipes) {
+                SectionTitle("Recetas destacadas")
+            }
+
+            items(recetas) { receta ->
+
                 RecipeCard(
-                    title = it,
-                    subtitle = "Menu description.",
-                    icon = R.drawable.ic_arrow_up
+                    title = receta.titulo,
+                    subtitle = receta.descripcion,
+                    icon = R.drawable.ic_arrow_up,
+                    onClick = {
+
+                        onNavigate("receta/${receta.id}")
+                    }
                 )
             }
 
-            item { SectionTitle("Recetas favoritas") }
+            // FAVORITAS
+            if (favoritas.isNotEmpty()) {
 
-            items(favoriteRecipes) {
-                RecipeCard(
-                    title = it,
-                    subtitle = "Nombre Chef",
-                    icon = R.drawable.ic_arrow_up
-                )
+                item {
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    SectionTitle("Recetas favoritas")
+                }
+
+                items(favoritas) { receta ->
+
+                    RecipeCard(
+                        title = receta.titulo,
+                        subtitle = receta.descripcion,
+                        icon = R.drawable.ic_arrow_up,
+                        onClick = {
+
+                            onNavigate("receta/${receta.id}")
+                        }
+                    )
+                }
             }
 
-            item { SectionTitle("Historial de recetas") }
+            // HISTORIAL
+            item {
 
-            items(historyRecipes) {
+                Spacer(modifier = Modifier.height(10.dp))
+
+                SectionTitle("Historial de recetas")
+            }
+
+            items(recetas.take(5)) { receta ->
+
                 RecipeCard(
-                    title = it,
-                    subtitle = "Nombre Chef",
-                    icon = R.drawable.ic_arrow_up
+                    title = receta.titulo,
+                    subtitle = receta.descripcion,
+                    icon = R.drawable.ic_arrow_up,
+                    onClick = {
+
+                        onNavigate("receta/${receta.id}")
+                    }
                 )
             }
         }
@@ -138,11 +200,24 @@ fun MainMenuScreen(
 
 @Composable
 fun SearchBar() {
+
+    var text by remember { mutableStateOf("") }
+
     OutlinedTextField(
-        value = "",
-        onValueChange = {},
-        placeholder = { Text("Buscar…", fontSize = 18.sp) },
+        value = text,
+        onValueChange = {
+
+            text = it
+        },
+        placeholder = {
+
+            Text(
+                "Buscar…",
+                fontSize = 18.sp
+            )
+        },
         leadingIcon = {
+
             Icon(
                 painter = painterResource(R.drawable.ic_search),
                 contentDescription = null,
@@ -156,9 +231,9 @@ fun SearchBar() {
     )
 }
 
-
 @Composable
 fun SectionTitle(text: String) {
+
     Text(
         text = text,
         fontSize = 30.sp,
@@ -169,25 +244,52 @@ fun SectionTitle(text: String) {
 }
 
 @Composable
-fun RecipeCard(title: String, subtitle: String, icon: Int) {
+fun RecipeCard(
+    title: String,
+    subtitle: String,
+    icon: Int,
+    onClick: () -> Unit
+) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp),
+            .height(100.dp)
+            .clickable {
+
+                onClick()
+            },
+
         shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        )
     ) {
+
         Row(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(18.dp),
+
             horizontalArrangement = Arrangement.SpaceBetween,
+
             verticalAlignment = Alignment.CenterVertically
         ) {
 
             Column {
-                Text(title, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                Text(subtitle, fontSize = 14.sp, color = Color.Gray)
+
+                Text(
+                    text = title,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Text(
+                    text = subtitle,
+                    fontSize = 14.sp,
+                    color = Color.Gray
+                )
             }
 
             Icon(
@@ -203,5 +305,6 @@ fun RecipeCard(title: String, subtitle: String, icon: Int) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewMainMenuScreen() {
+
     MainMenuScreen()
 }
