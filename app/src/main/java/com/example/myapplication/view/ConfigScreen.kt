@@ -12,10 +12,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.font.FontWeight
+import com.example.myapplication.ui.theme.MyApplicationTheme
 
 @Composable
 fun ConfigScreen(
@@ -27,185 +28,298 @@ fun ConfigScreen(
     var notifAll by remember { mutableStateOf(false) }
     var notifMentions by remember { mutableStateOf(false) }
 
-    LazyColumn(
+    MyApplicationTheme(dynamicColor = false) {
+
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.primary
+        ) {
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+
+                item {
+
+                    Text(
+                        text = "Administración de cuenta",
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.padding(vertical = 12.dp)
+                    )
+                }
+
+                // --- Nombre ---
+                item {
+
+                    Text(
+                        text = "Nombre",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    OutlinedTextField(
+                        value = username,
+                        onValueChange = { username = it },
+
+                        modifier = Modifier.fillMaxWidth(),
+
+                        shape = RoundedCornerShape(12.dp),
+
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
+                            focusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                            cursorColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Button(
+                        onClick = { },
+
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.onPrimary,
+                            contentColor = MaterialTheme.colorScheme.primary
+                        ),
+
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+
+                        Text("Cambiar nombre")
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+                }
+
+                // --- Tema oscuro ---
+                item {
+
+                    Text(
+                        text = "Tema Oscuro",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+
+                        verticalAlignment = Alignment.CenterVertically,
+
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+
+                        SettingsIconContainer(
+                            shape = CircleShape
+                        ) {
+
+                            Icon(
+                                imageVector = Icons.Default.Brightness4,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+
+                        Switch(
+                            checked = darkMode,
+                            onCheckedChange = { darkMode = it },
+
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                                checkedTrackColor = MaterialTheme.colorScheme.secondary
+                            )
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+                }
+
+                // --- Idioma ---
+                item {
+
+                    Text(
+                        text = "Idioma",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    SettingsIconContainer(
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+
+                        Icon(
+                            imageVector = Icons.Default.Language,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+                }
+
+                // --- Notificaciones ---
+                item {
+
+                    Text(
+                        text = "Notificaciones",
+
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+
+                        horizontalArrangement = Arrangement.SpaceBetween,
+
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        Text(
+                            text = "Recibir todas",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+
+                        Switch(
+                            checked = notifAll,
+                            onCheckedChange = { notifAll = it },
+
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                                checkedTrackColor = MaterialTheme.colorScheme.secondary
+                            )
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+
+                        horizontalArrangement = Arrangement.SpaceBetween,
+
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        Text(
+                            text = "Recibir solo menciones",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+
+                        Switch(
+                            checked = notifMentions,
+                            onCheckedChange = { notifMentions = it },
+
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                                checkedTrackColor = MaterialTheme.colorScheme.secondary
+                            )
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(28.dp))
+                }
+
+                // --- Guardar ---
+                item {
+
+                    Button(
+                        onClick = { },
+
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.onPrimary,
+                            contentColor = MaterialTheme.colorScheme.primary
+                        ),
+
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+
+                        Text("Guardar Cambios")
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+                }
+
+                // --- Cerrar sesión ---
+                item {
+
+                    Button(
+                        onClick = { },
+
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.onPrimary,
+                            contentColor = MaterialTheme.colorScheme.primary
+                        ),
+
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+
+                        Text("Cerrar Sesión")
+                    }
+
+                    Spacer(modifier = Modifier.height(80.dp))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SettingsIconContainer(
+    shape: Shape,
+    content: @Composable () -> Unit
+) {
+
+    Box(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+            .size(40.dp)
+            .background(
+                color = MaterialTheme.colorScheme.onPrimary,
+                shape = shape
+            )
+            .padding(8.dp),
+
+        contentAlignment = Alignment.Center
     ) {
 
-        item {
-            Text(
-                text = "Administración de cuenta",
-                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(vertical = 12.dp)
-            )
-        }
-
-        // --- Nombre ---
-        item {
-            Text("Nombre", style = MaterialTheme.typography.titleMedium)
-
-            Spacer(modifier = Modifier.height(6.dp))
-
-            OutlinedTextField(
-                value = username,
-                onValueChange = { username = it },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Button(
-                onClick = { /* cambiar nombre */ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF6E4800),
-                    contentColor = Color.White
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text("Cambiar nombre")
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-        }
-
-        // --- Tema oscuro ---
-        item {
-            Text("Tema Oscuro", style = MaterialTheme.typography.titleMedium)
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Brightness4,
-                    contentDescription = null,
-                    tint = Color(0xFF6E4800),
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(Color(0xFFF9C979), CircleShape)
-                        .padding(8.dp)
-                )
-
-                Switch(
-                    checked = darkMode,
-                    onCheckedChange = { darkMode = it }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-        }
-
-        // --- Idioma ---
-        item {
-            Text("Idioma", style = MaterialTheme.typography.titleMedium)
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Icon(
-                imageVector = Icons.Default.Language,
-                contentDescription = null,
-                tint = Color(0xFF6E4800),
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(Color(0xFFF9C979), RoundedCornerShape(8.dp))
-                    .padding(8.dp)
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-        }
-
-        // --- Notificaciones ---
-        item {
-            Text(
-                "Notificaciones",
-                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("Recibir todas", style = MaterialTheme.typography.titleMedium)
-
-                Switch(
-                    checked = notifAll,
-                    onCheckedChange = { notifAll = it }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("Recibir solo menciones", style = MaterialTheme.typography.titleMedium)
-
-                Switch(
-                    checked = notifMentions,
-                    onCheckedChange = { notifMentions = it }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(28.dp))
-        }
-
-        // --- Guardar ---
-        item {
-            Button(
-                onClick = { /* guardar */ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF6E4800),
-                    contentColor = Color.White
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text("Guardar Cambios")
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-        }
-
-        // --- Cerrar sesión ---
-        item {
-            Button(
-                onClick = { /* logout */ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF6E4800),
-                    contentColor = Color.White
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text("Cerrar Sesión")
-            }
-
-            Spacer(modifier = Modifier.height(80.dp))
-        }
+        content()
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun PreviewConfigScreen() {
-    MaterialTheme {
-        ConfigScreen()
-    }
+
+    ConfigScreen()
 }
