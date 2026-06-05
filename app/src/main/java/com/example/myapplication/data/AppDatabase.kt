@@ -11,7 +11,7 @@ import androidx.room.RoomDatabase
         RecetaEntity::class,
         FavoritoEntity::class
     ],
-    version = 5
+    version = 6
 )
 
 abstract class AppDatabase : RoomDatabase() {
