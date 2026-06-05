@@ -1,5 +1,6 @@
 package com.example.myapplication.view
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -17,6 +18,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.viewmodel.RegisterViewModel
 import kotlinx.coroutines.delay
+import androidx.compose.foundation.background
+import com.example.myapplication.R
 
 @Composable
 fun RegisterScreen(
