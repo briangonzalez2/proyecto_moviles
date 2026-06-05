@@ -59,6 +59,14 @@ fun RecetasScreenContent(
     receta: RecetaEntity?
 ) {
 
+    var favorito by remember {
+        mutableStateOf(false)
+    }
+
+    var rating by remember {
+        mutableStateOf(0)
+    }
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.primary
@@ -108,14 +116,17 @@ fun RecetasScreenContent(
 
                         IconButton(
                             onClick = {
-                                // FAVORITOS
+                                favorito = !favorito
                             }
                         ) {
-
                             Icon(
                                 imageVector = Icons.Default.Favorite,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.secondary
+                                tint =
+                                    if (favorito)
+                                        androidx.compose.ui.graphics.Color.Red
+                                    else
+                                        MaterialTheme.colorScheme.onPrimary
                             )
                         }
                     }
@@ -191,14 +202,25 @@ fun RecetasScreenContent(
 
                     Row {
 
-                        repeat(5) {
+                        repeat(5) { index ->
 
-                            Icon(
-                                imageVector = Icons.Default.Star,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.secondary,
-                                modifier = Modifier.size(32.dp)
-                            )
+                            IconButton(
+                                onClick = {
+                                    rating = index + 1
+                                }
+                            ) {
+
+                                Icon(
+                                    imageVector = Icons.Default.Star,
+                                    contentDescription = null,
+                                    tint =
+                                        if (index < rating)
+                                            androidx.compose.ui.graphics.Color.Yellow
+                                        else
+                                            MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.4f),
+                                    modifier = Modifier.size(32.dp)
+                                )
+                            }
                         }
                     }
 

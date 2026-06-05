@@ -8,6 +8,7 @@ import com.example.myapplication.data.UsuarioEntity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import com.example.myapplication.session.UserSession
 
 data class LoginState(
     val success: Boolean = false,
@@ -18,6 +19,8 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     private val db = AppDatabase.getDatabase(application)
     private val usuarioDao = db.usuarioDao()
+
+    private val session = UserSession(application)
 
     private val _state = MutableStateFlow(LoginState())
     val state: StateFlow<LoginState> = _state
@@ -40,6 +43,12 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
             if (user != null) {
 
+                session.saveUser(
+                    id = user.id_usuario,
+                    nombre = user.nombre_usuario,
+                    correo = user.email
+                )
+
                 _state.value = LoginState(
                     success = true,
                     message = "Bienvenido ${user.nombre_usuario}"
@@ -49,7 +58,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
                 _state.value = LoginState(
                     success = false,
-                    message = "Nombre o Contraseña incorrecto"
+                    message = "Nombre o contraseña incorrecto"
                 )
             }
         }
@@ -57,16 +66,29 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     fun crearUsuarioDemo() {
 
+
+
         viewModelScope.launch {
 
+
+
             usuarioDao.insertarUsuario(
+
                 UsuarioEntity(
+
                     nombre_usuario = "admin",
+
                     email = "admin@test.com",
+
                     password = "1234",
+
                     role = "chef"
+
                 )
+
             )
+
         }
+
     }
 }

@@ -54,6 +54,15 @@ fun MisRecetasScreen(
         vm?.recetas?.collectAsState()?.value ?: emptyList()
     }
 
+    LaunchedEffect(nombreUsuario) {
+
+        println("NOMBRE USUARIO SCREEN = '$nombreUsuario'")
+
+        if (nombreUsuario.isNotEmpty()) {
+            vm?.cargarRecetas(nombreUsuario)
+        }
+    }
+
     if (!isPreview) {
 
         LaunchedEffect(nombreUsuario) {

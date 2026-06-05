@@ -23,7 +23,7 @@ fun ConfigScreen(
     onBack: () -> Unit = {}
 ) {
 
-    var username by remember { mutableStateOf("Usuario") }
+    var username by remember { mutableStateOf("") }
     var darkMode by remember { mutableStateOf(false) }
     var notifAll by remember { mutableStateOf(false) }
     var notifMentions by remember { mutableStateOf(false) }
@@ -104,49 +104,6 @@ fun ConfigScreen(
                     Spacer(modifier = Modifier.height(20.dp))
                 }
 
-                // --- Tema oscuro ---
-                item {
-
-                    Text(
-                        text = "Tema Oscuro",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-
-                        verticalAlignment = Alignment.CenterVertically,
-
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-
-                        SettingsIconContainer(
-                            shape = CircleShape
-                        ) {
-
-                            Icon(
-                                imageVector = Icons.Default.Brightness4,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
-
-                        Switch(
-                            checked = darkMode,
-                            onCheckedChange = { darkMode = it },
-
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
-                                checkedTrackColor = MaterialTheme.colorScheme.secondary
-                            )
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(20.dp))
-                }
 
                 // --- Idioma ---
                 item {

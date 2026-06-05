@@ -24,10 +24,15 @@ class MisRecetasViewModel(application: Application)
 
     fun cargarRecetas(usuario: String) {
 
+        println("BUSCANDO RECETAS DE = $usuario")
+
         viewModelScope.launch {
 
-            _recetas.value =
-                recetaDao.obtenerRecetasDeUsuario(usuario)
+            val lista = recetaDao.obtenerRecetasDeUsuario(usuario)
+
+            println("RECETAS ENCONTRADAS = ${lista.size}")
+
+            _recetas.value = lista
         }
     }
 }

@@ -22,6 +22,8 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.myapplication.session.UserSession
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.viewmodel.CrearRecetaViewModel
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 
 
@@ -73,6 +75,8 @@ fun CrearRecetaScreen(
         SnackbarHostState()
     }
 
+    val scrollState = rememberScrollState()
+
     LaunchedEffect(state.message) {
 
         state.message?.let { msg ->
@@ -106,6 +110,7 @@ fun CrearRecetaScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
+                        .verticalScroll(scrollState)
                         .padding(16.dp)
                 ) {
                     val textFieldColors = OutlinedTextFieldDefaults.colors(
@@ -188,7 +193,7 @@ fun CrearRecetaScreen(
                     // Reversed button colors: 'Crear receta' now uses Secondary
                     Button(
                         onClick = {
-
+                            println("AUTOR RECETA = $nombreUsuario")
                             vm?.crearReceta(
                                 titulo,
                                 descripcion,
