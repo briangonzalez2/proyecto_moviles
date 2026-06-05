@@ -14,10 +14,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,31 +29,55 @@ import com.example.myapplication.ui.theme.MyApplicationTheme
 @Composable
 fun AppScaffold(
     onNavigate: (String) -> Unit = {},
-    content: @Composable () -> Unit
+    content: @Composable (
+        snackbarHostState: SnackbarHostState
+    ) -> Unit
 ) {
 
     var sidebarOpen by remember { mutableStateOf(false) }
 
+    val snackbarHostState = remember {
+        SnackbarHostState()
+    }
+
     MyApplicationTheme(dynamicColor = false) {
 
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.primary
-        ) {
+        Scaffold(
+
+            containerColor = MaterialTheme.colorScheme.primary,
+
+            snackbarHost = {
+
+                SnackbarHost(
+                    hostState = snackbarHostState
+                )
+            }
+
+        ) { innerPadding ->
 
             Box(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
             ) {
 
                 // ----------- CONTENT -----------
-                Column {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .systemBarsPadding()
+                ) {
 
                     TopBar(
-                        onMenuClick = { sidebarOpen = true },
-                        onProfileClick = { onNavigate("perfil") }
+                        onMenuClick = {
+                            sidebarOpen = true
+                        },
+                        onProfileClick = {
+                            onNavigate("perfil")
+                        }
                     )
 
-                    content()
+                    content(snackbarHostState)
                 }
 
                 // ----------- OVERLAY -----------
@@ -65,7 +86,9 @@ fun AppScaffold(
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Color.Black.copy(alpha = 0.4f))
+                            .background(
+                                Color.Black.copy(alpha = 0.4f)
+                            )
                             .clickable {
                                 sidebarOpen = false
                             }
@@ -114,7 +137,10 @@ fun Sidebar(
         modifier = Modifier
             .width(230.dp)
             .fillMaxHeight()
-            .background(MaterialTheme.colorScheme.primary)
+            .background(
+                MaterialTheme.colorScheme.primary
+            )
+            .systemBarsPadding()
             .padding(16.dp)
     ) {
 
@@ -122,7 +148,7 @@ fun Sidebar(
 
             Icon(
                 imageVector = Icons.Default.ArrowBack,
-                contentDescription = "close",
+                contentDescription = "Cerrar menú",
 
                 tint = MaterialTheme.colorScheme.onPrimary,
 
@@ -133,7 +159,9 @@ fun Sidebar(
                     }
             )
 
-            Spacer(Modifier.height(20.dp))
+            Spacer(
+                modifier = Modifier.height(20.dp)
+            )
 
             SidebarItem(
                 icon = Icons.Default.Home,
@@ -186,14 +214,16 @@ fun SidebarItem(
 
         Icon(
             imageVector = icon,
-            contentDescription = null,
+            contentDescription = text,
 
             tint = MaterialTheme.colorScheme.onPrimary,
 
             modifier = Modifier.size(26.dp)
         )
 
-        Spacer(Modifier.width(12.dp))
+        Spacer(
+            modifier = Modifier.width(12.dp)
+        )
 
         Text(
             text = text,
@@ -222,7 +252,7 @@ fun TopBar(
 
         Icon(
             imageVector = Icons.Default.Menu,
-            contentDescription = null,
+            contentDescription = "Menú",
 
             tint = MaterialTheme.colorScheme.onPrimary,
 
@@ -242,7 +272,7 @@ fun TopBar(
 
         Icon(
             imageVector = Icons.Default.Person,
-            contentDescription = null,
+            contentDescription = "Perfil",
 
             tint = MaterialTheme.colorScheme.onPrimary,
 

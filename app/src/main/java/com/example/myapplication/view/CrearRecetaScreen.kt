@@ -23,6 +23,8 @@ import com.example.myapplication.session.UserSession
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.viewmodel.CrearRecetaViewModel
 
+
+
 @Composable
 fun CrearRecetaScreen(
     onBack: () -> Unit
@@ -61,128 +63,173 @@ fun CrearRecetaScreen(
         imagenUri = uri
     }
 
+    val state = if (isPreview) {
+        remember { mutableStateOf(CrearRecetaViewModel.CrearRecetaState()) }.value
+    } else {
+        vm!!.state.collectAsState().value
+    }
+
+    val snackbarHostState = remember {
+        SnackbarHostState()
+    }
+
+    LaunchedEffect(state.message) {
+
+        state.message?.let { msg ->
+
+            snackbarHostState.showSnackbar(
+                message = msg
+            )
+        }
+    }
+
     // Use the app theme and a Surface with the Primary color for the background.
     MyApplicationTheme(dynamicColor = false) {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.primary
-        ) {
-            Column(
+        Scaffold(
+
+            containerColor = MaterialTheme.colorScheme.primary,
+
+            snackbarHost = {
+
+                SnackbarHost(
+                    hostState = snackbarHostState
+                )
+            }
+
+        ) { innerPadding ->
+            Surface(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(innerPadding),
+                color = MaterialTheme.colorScheme.primary
             ) {
-                val textFieldColors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
-                    focusedLabelColor = MaterialTheme.colorScheme.onPrimary,
-                    unfocusedLabelColor = MaterialTheme.colorScheme.onPrimary,
-                    focusedTextColor = MaterialTheme.colorScheme.onPrimary,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
-                    cursorColor = MaterialTheme.colorScheme.onPrimary
-                )
-
-                OutlinedTextField(
-                    value = titulo,
-                    onValueChange = { titulo = it },
-                    label = { Text("Título") },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = textFieldColors
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                OutlinedTextField(
-                    value = descripcion,
-                    onValueChange = { descripcion = it },
-                    label = { Text("Descripción") },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = textFieldColors
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                OutlinedTextField(
-                    value = tiempo,
-                    onValueChange = { tiempo = it },
-                    label = { Text("Tiempo (min)") },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = textFieldColors
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                OutlinedTextField(
-                    value = dificultad,
-                    onValueChange = { dificultad = it },
-                    label = { Text("Dificultad") },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = textFieldColors
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Button(
-                    onClick = {
-                        launcher.launch("image/*")
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.onPrimary,
-                        contentColor = MaterialTheme.colorScheme.primary
-                    )
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
                 ) {
-                    Text("Seleccionar Imagen")
-                }
+                    val textFieldColors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
+                        focusedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                        unfocusedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                        focusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                        cursorColor = MaterialTheme.colorScheme.onPrimary
+                    )
 
-                imagenUri?.let {
+                    OutlinedTextField(
+                        value = titulo,
+                        onValueChange = { titulo = it },
+                        label = { Text("Título") },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = textFieldColors
+                    )
+
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    Image(
-                        painter = rememberAsyncImagePainter(it),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(200.dp)
-                            .clip(RoundedCornerShape(12.dp)),
-                        contentScale = ContentScale.Crop
+                    OutlinedTextField(
+                        value = descripcion,
+                        onValueChange = { descripcion = it },
+                        label = { Text("Descripción") },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = textFieldColors
                     )
-                }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
-                // Reversed button colors: 'Crear receta' now uses Secondary
-                Button(
-                    onClick = {
-                        vm?.crearReceta(
-                            titulo,
-                            descripcion,
-                            tiempo,
-                            dificultad,
-                            imagenUri,
-                            nombreUsuario
+                    OutlinedTextField(
+                        value = tiempo,
+                        onValueChange = { tiempo = it },
+                        label = { Text("Tiempo (min)") },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = textFieldColors
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    OutlinedTextField(
+                        value = dificultad,
+                        onValueChange = { dificultad = it },
+                        label = { Text("Dificultad") },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = textFieldColors
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Button(
+                        onClick = {
+                            launcher.launch("image/*")
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.onPrimary,
+                            contentColor = MaterialTheme.colorScheme.primary
                         )
-                        onBack()
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.onPrimary,
-                        contentColor = MaterialTheme.colorScheme.primary
-                    )
-                ) {
-                    Text("Crear receta")
-                }
+                    ) {
+                        Text("Seleccionar Imagen")
+                    }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                    imagenUri?.let {
+                        Spacer(modifier = Modifier.height(12.dp))
 
-                // Reversed button colors: 'Cancelar' now uses OnPrimary
-                Button(
-                    onClick = onBack,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.onPrimary,
-                        contentColor = MaterialTheme.colorScheme.primary
-                    )
-                ) {
-                    Text("Cancelar")
+                        Image(
+                            painter = rememberAsyncImagePainter(it),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(200.dp)
+                                .clip(RoundedCornerShape(12.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // Reversed button colors: 'Crear receta' now uses Secondary
+                    Button(
+                        onClick = {
+
+                            vm?.crearReceta(
+                                titulo,
+                                descripcion,
+                                tiempo,
+                                dificultad,
+                                imagenUri,
+                                nombreUsuario
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.onPrimary,
+                            contentColor = MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        Text("Crear receta")
+                    }
+
+                    if (state.success && !isPreview) {
+
+                        LaunchedEffect(state.success) {
+
+                            kotlinx.coroutines.delay(1500)
+
+                            onBack()
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Reversed button colors: 'Cancelar' now uses OnPrimary
+                    Button(
+                        onClick = onBack,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.onPrimary,
+                            contentColor = MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        Text("Cancelar")
+                    }
                 }
             }
         }
@@ -191,6 +238,8 @@ fun CrearRecetaScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun CrearRecetasScreenPreview() {
-    CrearRecetaScreen(onBack = {})
+fun CrearRecetaScreenPreview() {
+    CrearRecetaScreen(
+        onBack = {}
+    )
 }

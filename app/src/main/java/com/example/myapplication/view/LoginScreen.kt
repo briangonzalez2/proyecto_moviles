@@ -24,6 +24,8 @@ import com.example.myapplication.R
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.viewmodel.LoginState
 import com.example.myapplication.viewmodel.LoginViewModel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 
 @Composable
 fun LoginScreen(
@@ -34,7 +36,6 @@ fun LoginScreen(
     val context = LocalContext.current
     val isPreview = LocalInspectionMode.current
 
-    // Evita errores del Preview
     val vm: LoginViewModel? = if (isPreview) {
         null
     } else {
@@ -45,7 +46,6 @@ fun LoginScreen(
         )
     }
 
-    // Estado falso para Preview
     val state = if (isPreview) {
         remember { mutableStateOf(LoginState()) }.value
     } else {
@@ -55,7 +55,12 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var pass by remember { mutableStateOf("") }
 
-    // Solo ejecutar fuera del Preview
+    val snackbarHostState = remember {
+        SnackbarHostState()
+    }
+
+    val scope = rememberCoroutineScope()
+
     if (!isPreview) {
         LaunchedEffect(Unit) {
             vm?.crearUsuarioDemo()
@@ -64,161 +69,187 @@ fun LoginScreen(
 
     MyApplicationTheme(dynamicColor = false) {
 
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.primary
-        ) {
+        Scaffold(
 
-            Box(
-                modifier = Modifier.fillMaxSize()
+            containerColor = MaterialTheme.colorScheme.primary,
+
+            snackbarHost = {
+
+                SnackbarHost(
+                    hostState = snackbarHostState
+                )
+            }
+
+        ) { innerPadding ->
+
+            Surface(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                color = MaterialTheme.colorScheme.primary
             ) {
 
-                Image(
-                    painter = painterResource(R.drawable.img),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop,
-                    alpha = 0.15f
-                )
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                Box(
+                    modifier = Modifier.fillMaxSize()
                 ) {
 
-                    Text(
-                        text = "Fast Cook!",
-                        fontSize = 40.sp,
-                        fontFamily = FontFamily.Cursive,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.padding(bottom = 40.dp)
+                    Image(
+                        painter = painterResource(R.drawable.img),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                        alpha = 0.15f
                     )
 
-                    val textFieldColors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
-                        focusedLabelColor = MaterialTheme.colorScheme.onPrimary,
-                        unfocusedLabelColor = MaterialTheme.colorScheme.onPrimary,
-                        focusedTextColor = MaterialTheme.colorScheme.onPrimary,
-                        unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
-                        cursorColor = MaterialTheme.colorScheme.onPrimary
-                    )
-
-                    Text(
-                        text = "Correo",
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    OutlinedTextField(
-                        value = email,
-                        onValueChange = { email = it },
-                        placeholder = {
-                            Text(
-                                "Correo",
-                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f)
-                            )
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = textFieldColors
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Text(
-                        text = "Contraseña",
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    OutlinedTextField(
-                        value = pass,
-                        onValueChange = { pass = it },
-                        placeholder = {
-                            Text(
-                                "Contraseña",
-                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f)
-                            )
-                        },
-                        visualTransformation = PasswordVisualTransformation(),
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = textFieldColors
-                    )
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    Button(
-                        onClick = {
-                            vm?.login(email, pass)
-                        },
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.onPrimary,
-                            contentColor = MaterialTheme.colorScheme.primary
-                        ),
-                        shape = RoundedCornerShape(12.dp)
+                            .fillMaxSize()
+                            .padding(horizontal = 24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
                     ) {
-                        Text(
-                            text = "Login",
-                            fontSize = 18.sp
-                        )
-                    }
 
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    OutlinedButton(
-                        onClick = onNavigateToRegister,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(48.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        border = BorderStroke(
-                            2.dp,
-                            MaterialTheme.colorScheme.onPrimary
-                        )
-                    ) {
                         Text(
-                            text = "Register",
+                            text = "Fast Cook!",
+                            fontSize = 40.sp,
+                            fontFamily = FontFamily.Cursive,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.padding(bottom = 40.dp)
+                        )
+
+                        val textFieldColors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.onPrimary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
+                            focusedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                            unfocusedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                            focusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                            cursorColor = MaterialTheme.colorScheme.onPrimary
+                        )
+
+                        Text(
+                            text = "Correo",
                             color = MaterialTheme.colorScheme.onPrimary
                         )
-                    }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(6.dp))
 
-                    state.message?.let { msg ->
+                        OutlinedTextField(
+                            value = email,
+                            onValueChange = { email = it },
+                            placeholder = {
+                                Text(
+                                    "Ingrese su correo",
+                                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f)
+                                )
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = textFieldColors
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
 
                         Text(
-                            text = msg,
-                            color =
-                                if (state.success)
-                                    MaterialTheme.colorScheme.secondary
-                                else
-                                    MaterialTheme.colorScheme.error
+                            text = "Contraseña",
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
-                    }
 
-                    if (state.success && !isPreview) {
-                        LaunchedEffect(Unit) {
-                            onLoginSuccess()
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        OutlinedTextField(
+                            value = pass,
+                            onValueChange = { pass = it },
+                            placeholder = {
+                                Text(
+                                    "Ingrese su contraseña",
+                                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f)
+                                )
+                            },
+                            visualTransformation = PasswordVisualTransformation(),
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = textFieldColors
+                        )
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        Button(
+                            onClick = {
+                                vm?.login(email, pass)
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.onPrimary,
+                                contentColor = MaterialTheme.colorScheme.primary
+                            ),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+
+                            Text(
+                                text = "Iniciar Sesión",
+                                fontSize = 18.sp
+                            )
                         }
-                    }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
-                    TextButton(
-                        onClick = onNavigateToRegister
-                    ) {
-                        Text(
-                            text = "¿No tienes cuenta? Regístrate",
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
+                        OutlinedButton(
+                            onClick = onNavigateToRegister,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(
+                                2.dp,
+                                MaterialTheme.colorScheme.onPrimary
+                            )
+                        ) {
+
+                            Text(
+                                text = "Registrar cuenta",
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
+
+                        LaunchedEffect(state.success) {
+
+                            if (state.success && !isPreview) {
+
+                                snackbarHostState.showSnackbar(
+                                    message = state.message ?: "Inicio de sesión exitoso"
+                                )
+
+                                delay(900)
+
+                                onLoginSuccess()
+                            }
+                        }
+
+                        LaunchedEffect(state.message) {
+
+                            if (!state.success) {
+
+                                state.message?.let { msg ->
+
+                                    snackbarHostState.showSnackbar(
+                                        message = state.message ?: "No pudimos iniciar sesión, revise su correo y contraseña"
+                                    )
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        TextButton(
+                            onClick = onNavigateToRegister
+                        ) {
+
+                            Text(
+                                text = "¿No tienes cuenta? Regístrate",
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
                     }
                 }
             }
@@ -229,6 +260,7 @@ fun LoginScreen(
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
+
     LoginScreen(
         onLoginSuccess = {},
         onNavigateToRegister = {}

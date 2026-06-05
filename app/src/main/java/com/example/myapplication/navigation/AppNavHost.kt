@@ -194,12 +194,17 @@ fun AppNavHost(navController: NavHostController) {
 
         // ➕ CREAR RECETA
         composable("crear_receta") {
-
-            CrearRecetaScreen(
-                onBack = {
-                    navController.popBackStack()
+            AppScaffold(
+                onNavigate = { route ->
+                    navController.navigate(route)
                 }
-            )
+            ) {
+                CrearRecetaScreen(
+                    onBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
         }
     }
 }
